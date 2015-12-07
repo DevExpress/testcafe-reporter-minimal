@@ -1,7 +1,7 @@
 {
   "name": "testcafe-reporter-minimal",
   "version": "1.0.0",
-  "description": "minimal TestCafe reporter plugin.",
+  "description": "Minimal TestCafe reporter plugin.",
   "repository": "https://github.com/DevExpress/testcafe-reporter-minimal",
   "author": {
     "name": "Developer Express Inc.",
