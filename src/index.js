@@ -9,7 +9,17 @@ export default function () {
         testCount:          0,
 
         reportTaskStart (startTime, userAgents, testCount) {
+            var uaList = userAgents
+                .map(ua => this.chalk.blue(ua))
+                .join(', ');
+
             this.testCount = testCount;
+
+            this.setIndent(0)
+                .useWordWrap(true)
+                .write(this.chalk.bold(`Running tests in: ${uaList}`))
+                .newline()
+                .newline();
         },
 
         reportFixtureStart (name) {
