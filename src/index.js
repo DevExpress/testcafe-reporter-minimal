@@ -1,4 +1,4 @@
-var NEW_LINE = '\n  ';
+var NEW_LINE = '\n ';
 
 export default function () {
     return {
@@ -9,25 +9,25 @@ export default function () {
         testCount:          0,
 
         reportTaskStart (startTime, userAgents, testCount) {
-            var uaList = userAgents
-                .map(ua => this.chalk.blue(ua))
-                .join(', ');
-
             this.testCount = testCount;
 
-            this.setIndent(0)
+            this.setIndent(1)
                 .useWordWrap(true)
-                .write(this.chalk.bold(`Running tests in: ${uaList}`))
-                .newline()
+                .write(this.chalk.bold('Running tests in:'))
                 .newline();
+
+            userAgents.forEach(ua => {
+                this.write(`- ${this.chalk.blue(ua)}`)
+                    .newline();
+            });
         },
 
         reportFixtureStart (name) {
             this.currentFixtureName = name;
         },
 
-        reportTestDone (name, errs) {
-            var hasErr = !!errs.length;
+        reportTestDone (name, testRunInfo) {
+            var hasErr = !!testRunInfo.errs.length;
             var dot    = hasErr ? this.chalk.red('.') : '.';
 
             if (this.spaceLeft - 1 < 0) {
@@ -40,7 +40,7 @@ export default function () {
             this.write(dot);
 
             if (hasErr) {
-                this.errDescriptors = this.errDescriptors.concat(errs.map(err => {
+                this.errDescriptors = this.errDescriptors.concat(testRunInfo.errs.map(err => {
                     return {
                         err:         err,
                         testName:    name,
@@ -50,34 +50,59 @@ export default function () {
             }
         },
 
-        reportTaskDone (endTime, passed) {
+        _renderErrors () {
+            this.newline();
+
+            this.errDescriptors.forEach((errDescriptor) => {
+                var title = `${this.chalk.bold.red(this.symbols.err)} ${errDescriptor.fixtureName} - ${errDescriptor.testName}`;
+
+                this.setIndent(1)
+                    .useWordWrap(true)
+                    .newline()
+                    .write(title)
+                    .newline()
+                    .newline()
+                    .setIndent(3)
+                    .write(this.formatError(errDescriptor.err))
+                    .newline()
+                    .newline();
+            });
+        },
+
+        _renderWarnings (warnings) {
+            this.newline()
+                .setIndent(1)
+                .write(this.chalk.bold.yellow(`Warnings (${warnings.length}):`))
+                .newline();
+
+            warnings.forEach(msg => {
+                this.setIndent(1)
+                    .write(this.chalk.bold.yellow(`--`))
+                    .newline()
+                    .setIndent(2)
+                    .write(msg)
+                    .newline();
+            });
+        },
+
+        reportTaskDone (endTime, passed, warnings) {
             var allPassed = !this.errDescriptors.length;
             var footer    = allPassed ?
                             this.chalk.bold.green(`${this.testCount} passed`) :
                             this.chalk.bold.red(`${this.testCount - passed}/${this.testCount} failed`);
 
-            this.setIndent(2)
-                .newline()
+            if (!allPassed)
+                this._renderErrors();
+            else
+                this.newline();
+
+            this.setIndent(1)
                 .newline()
                 .write(footer)
                 .newline();
 
-            if (!allPassed) {
-                this.errDescriptors.forEach((errDescriptor, idx) => {
-                    var prefix = `${idx + 1}) `;
-                    var title  = this.chalk.bold.red(`${prefix}${errDescriptor.fixtureName} - ${errDescriptor.testName}`);
-
-                    this.setIndent(2)
-                        .useWordWrap(true)
-                        .newline()
-                        .write(title)
-                        .newline()
-                        .setIndent(2 + prefix.length)
-                        .write(this.formatError(errDescriptor.err))
-                        .newline()
-                        .newline();
-                });
-            }
+            if (warnings.length)
+                this._renderWarnings(warnings);
         }
     };
 }
