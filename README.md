@@ -10,7 +10,7 @@ This is the **Minimal** reporter plugin for [TestCafe](http://devexpress.github.
 ## Install
 
 ```
-npm install -g testcafe-reporter-minimal
+npm install testcafe-reporter-minimal
 ```
 
 ## Usage
