@@ -2,7 +2,7 @@
  - Chrome 41.0.2227 / Mac OS X 10.10.1
  - Firefox 47 / Mac OS X 10.10.1
 
-  . . . . . .
+  . ! . . . - !
 
  ✖ First fixture - Second test in first fixture
 
@@ -72,6 +72,7 @@
 
 
  2/6 failed
+ 1 skipped
 
  Warnings (3):
  --
